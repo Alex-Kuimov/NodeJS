@@ -1,38 +1,64 @@
 const fs = require('fs');
 const path = require('path');
 
-const output = path.join(__dirname, 'output');
+function mkDir(folderPath, folderName){
+    return new Promise(resolve => {
+        fs.mkdir(folderPath, { recursive: true }, (err) => {
+            if (err) throw err;
+            console.log('Directory %s was created', folderName);
+            resolve('Directory %s was created', folderName);
+        });
+    });
+}
 
-const sortFiles = (input, level) => {
+function copyFile(fileFrom, fileTo, file){
+    return new Promise(resolve => {
+        fs.copyFile(fileFrom, fileTo, (err) => {
+            if (err) throw err;
+            console.log('File %s was copied', file);
+            resolve('File %s was copied', file);
+        });
+    });
+}
+
+function deleteFile(filePath, file){
+    return new Promise(resolve => {
+        fs.unlink(filePath, err => {
+            if (err) throw err;
+            console.log('File %s was deleted', file);
+            resolve('File %s was deleted', file);
+        });
+    });
+}
+
+async function sortFiles(input, output) {
     try {
         const files = fs.readdirSync(input);
 
-        files.forEach(item => {
-            let localBase = path.join(input, item);
-            let state = fs.statSync(localBase);
+        for (var i = 0; i < files.length; i++) {
+            const file = files[i];
+            const localBase = path.join(input, file);
+            const state = fs.statSync(localBase);
 
             if (state.isDirectory()) {
-                sortFiles(localBase, level + 1);
+                await sortFiles(localBase, output);
             } else {
-                const folderName = item.charAt(0);
+                const folderName = file.charAt(0);
                 const folderPath = path.join(output, folderName);
                 const fileFrom = localBase;
-                const fileTo = path.join(folderPath, item);
+                const fileTo = path.join(folderPath, file);
 
-                fs.mkdir(folderPath, { recursive: true }, (err) => {
-                    if (err) throw err;
-                    console.log('Directory %s was created', folderName);
-
-                    fs.copyFile(fileFrom, fileTo, (err) => {
-                        if (err) throw err;
-                        console.log('File %s was copied', item);
-                    });
-                });
+                await mkDir(folderPath, folderName);
+                await copyFile(fileFrom, fileTo, file);
+                await deleteFile(fileFrom, file);
             }
-        })
+        }
+
+        fs.rmdirSync(input);
+
     } catch (e) {
         console.error('outer', e.message);
-    }  
+    }      
 }
 
 module.exports = sortFiles;
