@@ -47,11 +47,11 @@ async function sortFiles(input, output, clear) {
 
         if(clear) {
             fs.rmdirSync(input);
-        }    
+        }
 
     } catch (e) {
         console.error('outer', e.message);
-    }      
+    }
 }
 
 module.exports = sortFiles;
