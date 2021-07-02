@@ -11,37 +11,29 @@ function mkDir(folderPath, folderName){
     });
 }
 
-function copyFile(fileFrom, fileTo, file){
+function moveFile(fileFrom, fileTo, file){
     return new Promise(resolve => {
-        fs.copyFile(fileFrom, fileTo, (err) => {
-            if (err) throw err;
-            console.log('File %s was copied', file);
-            resolve('File %s was copied', file);
-        });
+        fs.access(fileFrom, fs.constants.F_OK, (err) => {
+            if (err) throw err
+            fs.rename(fileFrom, fileTo, function (err) {
+                if (err) throw err
+                console.log('File %s was copied', file);
+                resolve('File %s was copied', file);
+            });
+        });       
     });
 }
 
-function deleteFile(filePath, file){
-    return new Promise(resolve => {
-        fs.unlink(filePath, err => {
-            if (err) throw err;
-            console.log('File %s was deleted', file);
-            resolve('File %s was deleted', file);
-        });
-    });
-}
-
-async function sortFiles(input, output) {
+async function sortFiles(input, output, clear) {
     try {
         const files = fs.readdirSync(input);
 
-        for (var i = 0; i < files.length; i++) {
-            const file = files[i];
+        for(const file of files) {
             const localBase = path.join(input, file);
             const state = fs.statSync(localBase);
 
             if (state.isDirectory()) {
-                await sortFiles(localBase, output);
+                await sortFiles(localBase, output, clear);
             } else {
                 const folderName = file.charAt(0);
                 const folderPath = path.join(output, folderName);
@@ -49,12 +41,13 @@ async function sortFiles(input, output) {
                 const fileTo = path.join(folderPath, file);
 
                 await mkDir(folderPath, folderName);
-                await copyFile(fileFrom, fileTo, file);
-                await deleteFile(fileFrom, file);
+                await moveFile(fileFrom, fileTo, file);
             }
         }
 
-        fs.rmdirSync(input);
+        if(clear) {
+            fs.rmdirSync(input);
+        }    
 
     } catch (e) {
         console.error('outer', e.message);
