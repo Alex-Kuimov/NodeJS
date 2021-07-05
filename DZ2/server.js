@@ -1,7 +1,11 @@
 const express = require("express");
 const app = express();
 
-const server = (DELAY, LIMIT, PORT) => {
+const runServer = (delay, limit, port) => {
+
+    if (delay === undefined || limit === undefined){
+        return;
+    }
 
     let connections = [];
 
@@ -9,6 +13,10 @@ const server = (DELAY, LIMIT, PORT) => {
         res.setHeader("Content-Type", "text/html; charset=utf-8");
         res.setHeader("Transfer-Encoding", "chunked");
         connections.push(res);
+    });
+
+    const server = app.listen(port, () => {
+        console.log(`Server is running on post ${port}`);
     });
 
 
@@ -19,7 +27,7 @@ const server = (DELAY, LIMIT, PORT) => {
 
         console.log(now);
 
-        if (++tick > LIMIT) {
+        if (++tick > limit) {
 
             connections.map(res => {
                 res.write(`${now}.\n`);
@@ -28,16 +36,13 @@ const server = (DELAY, LIMIT, PORT) => {
 
             connections = [];
             tick = 0;
+            server.close();
+        } else {
+            setTimeout(run, delay);
         }
 
-        setTimeout(run, DELAY);
-
-    }, DELAY);
-
-    app.listen(PORT, () => {
-        console.log(`Server is running on post ${PORT}`);
-    });
+    }, delay);
 
 }
 
-module.exports = server;
+module.exports = runServer;
