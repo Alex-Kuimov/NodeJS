@@ -1,47 +1,36 @@
 const express = require("express");
 const app = express();
 
-const runServer = (delay, limit, port) => {
+function toServer(interval){
+    return setInterval(function toServer(){
+        const now = new Date();
+        console.log(now);
+    }, interval);
+}
 
-    if (delay === undefined || limit === undefined){
+function toClient(timerId, time, res, server){
+    setTimeout(function run() { 
+        const now = new Date();           
+        res.write(`${now}.\n`);
+        res.end();
+        clearInterval(timerId);
+    }, time);
+}
+
+const runServer = (time, interval, port) => {
+
+    if (time === undefined || interval === undefined){
         return;
     }
 
-    let connections = [];
-
-    app.get("/date", (req, res, next) => {
-        res.setHeader("Content-Type", "text/html; charset=utf-8");
-        res.setHeader("Transfer-Encoding", "chunked");
-        connections.push(res);
+    app.get("/", function (req, res) {
+        const timerId = toServer(interval);
+        toClient(timerId, time, res, server);
     });
 
     const server = app.listen(port, () => {
         console.log(`Server is running on post ${port}`);
     });
-
-
-    let tick = 0;
-    setTimeout(function run() { 
-    
-        const now = new Date();
-
-        console.log(now);
-
-        if (++tick > limit) {
-
-            connections.map(res => {
-                res.write(`${now}.\n`);
-                res.end();
-            });
-
-            connections = [];
-            tick = 0;
-            server.close();
-        } else {
-            setTimeout(run, delay);
-        }
-
-    }, delay);
 
 }
 
