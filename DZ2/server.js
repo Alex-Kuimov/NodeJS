@@ -3,14 +3,14 @@ const app = express();
 
 function toServer(interval){
     return setInterval(function toServer(){
-        const now = new Date();
+        const now = new Date().toISOString();
         console.log(now);
     }, interval);
 }
 
 function toClient(timerId, time, res, server){
     setTimeout(function run() { 
-        const now = new Date();           
+        const now = new Date().toISOString();           
         res.write(`${now}.\n`);
         res.end();
         clearInterval(timerId);
