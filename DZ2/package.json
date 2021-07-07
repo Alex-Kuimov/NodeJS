@@ -1,0 +1,18 @@
+{
+  "name": "DZ2",
+  "version": "1.0.0",
+  "description": "dz2",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "dz2"
+  ],
+  "author": "Alexander Kuimov",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "yargs": "^17.0.1"
+  }
+}
