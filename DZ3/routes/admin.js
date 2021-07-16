@@ -1,10 +1,17 @@
 const express = require('express')
+const store = require('../store')
+
 const formidable = require('formidable')
 const router = express.Router()
 const db = require('../db')()
-const store = require('../store')
-const fs = require('fs')
 const path = require('path')
+
+const fs = require('fs')
+const util = require("util");
+
+const mkDir = util.promisify(fs.mkdir);
+const existsAsync = util.promisify(fs.existsSync)
+const unlinkSync = util.promisify(fs.unlinkSync)
 
 router.get('/', (req, res, next) => {
   res.render('pages/admin', { 
@@ -20,42 +27,57 @@ router.post('/skills', (req, res, next) => {
   let form = new formidable.IncomingForm({ multiples: true })
   
   form.parse(req, (err, fields, files) => {
+    const age = parseInt(fields.age);
+    const concerts = parseInt(fields.concerts);
+    const cities = parseInt(fields.cities);
+    const years = parseInt(fields.years);
+
     const skills = [
       {
-        "number": fields.age,
+        "number": age,
         "text": "Возраст начала занятий на скрипке"
       },
       {
-        "number": fields.concerts,
+        "number": concerts,
         "text": "Концертов отыграл"
       },
       {
-        "number": fields.cities,
+        "number": cities,
         "text": "Максимальное число городов в туре"
       },
       {
-        "number": fields.years,
+        "number": years,
         "text": "Лет на сцене в качестве скрипача"
       }
     ]
 
     db.set('skills', skills)
     db.save()
-    res.redirect('/admin/?msg=ok')
+
+    res.render('pages/admin', { 
+      title: 'Admin page', 
+      age: age, 
+      concerts: concerts, 
+      cities: cities, 
+      years: years,
+      msgskill: "Данные сохранены!"
+    })
+
   });
 })
 
-router.post('/upload', (req, res, next) => {  
+router.post('/upload', async (req, res, next) => {  
   let form = new formidable.IncomingForm()
   let upload = path.join('./public', 'assets', 'img', 'products')
-
-  if (!fs.existsSync(upload)) {
-    fs.mkdirSync(upload)
+  let exists = await existsAsync(upload)
+ 
+  if ( ! exists ) {
+    await mkDir(upload)
   }
   
   form.uploadDir = path.join(process.cwd(), upload)
 
-  form.parse(req, function (err, fields, files) {
+  form.parse(req, async (err, fields, files) => {
     if (err) {
       return next(err)
     }
@@ -63,7 +85,7 @@ router.post('/upload', (req, res, next) => {
     const valid = validation(fields, files)
 
     if (valid.err) {
-      fs.unlinkSync(files.photo.path)
+      await unlinkSync(files.photo.path)
       return res.redirect(`/?msg=${valid.status}`)
     }
     
@@ -86,7 +108,14 @@ router.post('/upload', (req, res, next) => {
 
       db.set('products', products)
       db.save()
-      res.redirect('/admin/?msg=ok')
+
+      res.render('pages/admin', { 
+        title: 'Admin page', 
+        "name": fields.name,
+        "price": parseInt(fields.price),
+        msgfile: "Товар загружен!"
+      })
+
     })
   })
 })
