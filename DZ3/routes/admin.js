@@ -10,8 +10,7 @@ const fs = require('fs')
 const util = require("util");
 
 const mkDir = util.promisify(fs.mkdir);
-const existsAsync = util.promisify(fs.existsSync)
-const unlinkSync = util.promisify(fs.unlinkSync)
+const unlink = util.promisify(fs.unlink)
 
 router.get('/', (req, res, next) => {
   res.render('pages/admin', { 
@@ -69,11 +68,10 @@ router.post('/skills', (req, res, next) => {
 router.post('/upload', async (req, res, next) => {  
   let form = new formidable.IncomingForm()
   let upload = path.join('./public', 'assets', 'img', 'products')
-  let exists = await existsAsync(upload)
- 
-  if ( ! exists ) {
+  
+  fs.access(upload, async (err) => {
     await mkDir(upload)
-  }
+  });
   
   form.uploadDir = path.join(process.cwd(), upload)
 
@@ -85,7 +83,7 @@ router.post('/upload', async (req, res, next) => {
     const valid = validation(fields, files)
 
     if (valid.err) {
-      await unlinkSync(files.photo.path)
+      await unlink(files.photo.path)
       return res.redirect(`/?msg=${valid.status}`)
     }
     
