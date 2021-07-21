@@ -11,7 +11,8 @@ const sequelize = new Sequelize(`postgres://${config.username}:${config.password
 fs
   .readdirSync(path.join(__dirname, modelsFolderPath))
   .forEach(file => {
-    let model = sequelize['import'](path.join(__dirname, modelsFolderPath, file));
+    let model = require(path.join(path.join(__dirname, modelsFolderPath), file))(sequelize, Sequelize.DataTypes)
+
     models[model.name] = model;
   });
 
