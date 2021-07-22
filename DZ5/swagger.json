@@ -21,7 +21,7 @@
   "consumes": ["application/json"],
   "produces": ["application/json"],
   "paths": {
-    "/users": {
+    "/": {
       "get": {
         "tags": ["Users"],
         "description": "Get all users",
@@ -46,7 +46,9 @@
             }
           }
         }
-      },
+      }
+    },
+    "/registration/": {
       "post": {
         "tags": [
           "Users"
@@ -184,6 +186,18 @@
           "uniqueItems": true
         },
         "username": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "surName": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "firstName": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "middleName": {
           "type": "string",
           "uniqueItems": true
         },
