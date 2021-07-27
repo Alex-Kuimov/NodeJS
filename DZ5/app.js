@@ -58,11 +58,7 @@ passport.use(new LocalStrategy({
   usernameField: "userName"
 }, async (userName, password, done) => {
 
-    console.log(userName);
-
     const user = await getUserbyName(userName);
-
-    console.log(user);
 
   if(userName === user.userName && password === user.password){
     return done(null, user)
