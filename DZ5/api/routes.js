@@ -1,123 +1,25 @@
 const express = require('express');
 const router = express.Router();
 
-const passport = require('passport');
+const UserController = require('../controllers/user.controllers');
+const AuthController = require('../controllers/auth.controllers');
+const ProfileController = require('../controllers/profile.conrtrollers');
+const NewsConrtroller = require('../controllers/news.conrtrollers');
 
-const User = require('../db').models.user;
-const Article = require('../db').models.article;
+const AuthMiddleware = require('../middleware/auth.middleware');
+const TokenMiddleware = require('../middleware/token.middleware');
 
-/* GET users listing. */
-router.get('/users/', async (req, res, next) => {
-  try {
-    const result = await User.findAll();
-    res.json({success: true, data: result});
-  }
-  catch(err) {
-    console.error(err);
-    res.json({success: false, err});
-  }
-});
+router.get('/users/', TokenMiddleware.isAuth, UserController.users);
+router.delete('/users/:id', TokenMiddleware.isAuth, UserController.deleteUser);
 
-router.post('/registration/', async (req, res, next) => {
-  try {
-    const { userName, surName, firstName, middleName, password } = req.body;
-    const data = {
-      userName,
-      surName,
-      firstName,
-      middleName,
-      password
-    };
+router.post('/registration/', AuthMiddleware.regisration, AuthController.registration);
+router.post('/login/', AuthMiddleware.login, AuthController.login);
+router.post('/refresh-token', AuthController.refreshToken);
 
-    const result = await User.create(data);
-    res.json({success: true, data: result});
-  }
-  catch(err) {
-    console.error(err);
-    res.json({success: false, err});
-  }
-});
+router.get('/profile/', TokenMiddleware.isAuth, ProfileController.profile);
 
-router.post('/login/', async (req, res, next) => {
-  try {
-    const { userName, password } = req.body;
-
-    const user = {
-      userName,
-      password,
-    }
-    
-    passport.authenticate("local", (err, user) => {
-      if(err){
-        return next(err)
-      }
-      if(!user){
-        return res.send("Wrong email or password")
-      }
-      req.login(user, () => {
-        res.json({success: true, data: user});
-      })
-    })(req, res, next)
-
-  }
-  catch(err) {
-    console.error(err);
-    res.json({success: false, err});
-  }
-});
-
-router.delete('/users/:id', async (req, res, next) => {
-  try {
-    const {id} = req.params;
-
-    const result = await User.destroy({where: {id}});
-    res.json({success: true, data: result});
-  }
-  catch(err) {
-    console.error(err);
-    res.json({success: false, err});
-  }
-});
-
-router.get('/news/', async (req, res, next) => {
-  try {
-    const result = await Article.findAll();
-    res.json({success: true, data: result});
-  }
-  catch(err) {
-    console.error(err);
-    res.json({success: false, err});
-  }
-});
-
-router.post('/news/', async (req, res, next) => {
-  try {
-    const { title, text } = req.body;
-    const data = {
-      title,
-      text,
-    };
-
-    const result = await Article.create(data);
-    res.json({success: true, data: result});
-  }
-  catch(err) {
-    console.error(err);
-    res.json({success: false, err});
-  }
-});
-
-router.delete('/news/:id', async (req, res, next) => {
-  try {
-    const {id} = req.params;
-
-    const result = await Article.destroy({where: {id}});
-    res.json({success: true, data: result});
-  }
-  catch(err) {
-    console.error(err);
-    res.json({success: false, err});
-  }
-});
+router.get('/news/', TokenMiddleware.isAuth, NewsConrtroller.news);
+router.post('/news/', TokenMiddleware.isAuth, NewsConrtroller.createNews);
+router.delete('/news/:id', TokenMiddleware.isAuth, NewsConrtroller.deleteNews);
 
 module.exports = router;

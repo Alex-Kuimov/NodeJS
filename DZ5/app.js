@@ -11,6 +11,7 @@ const FileStore = require("session-file-store")(session);
 const User = require('./db').models.user;
 
 const app = express();
+app.use(express.static(path.join(__dirname, 'build')));
 
 app.use(
 	session({
@@ -74,8 +75,6 @@ app.use(cookieParser());
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
-
-app.use(express.static(path.join(__dirname, 'build')));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api', require(path.join(__dirname, 'api')));
