@@ -20,10 +20,13 @@ module.exports = {
       surName: {
         type: Sequelize.STRING
       },
-      email: {
+      image: {
         type: Sequelize.STRING
       },
       password: {
+        type: Sequelize.STRING
+      },
+      permission: {
         type: Sequelize.STRING
       },
       createdAt: {

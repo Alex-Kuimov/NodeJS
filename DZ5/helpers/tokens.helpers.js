@@ -18,8 +18,8 @@ module.exports.tokensGenerate = (user) => {
   const data = {
     accessToken: token,
     refreshToken: refreshToken,
-    accessTokenExpiredAt: jwt.verify(token, secret).exp * 1000,
-    refreshTokenExpiredAt: jwt.verify(refreshToken, secret).exp * 1000,
+    accessTokenExpiredAt: jwt.verify(token, secret).exp * 10,
+    refreshTokenExpiredAt: jwt.verify(refreshToken, secret).exp * 10,
   };
   return data;
 };
