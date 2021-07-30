@@ -25,9 +25,9 @@ module.exports.registration = async (req, res) => {
       const user = await User.create(newUser);
       const tokens = tokensGenerate(user.dataValues);
      
-
       const responseData = {
         id: user.id,
+        image: user.image,
         userName,
         surName,
         firstName,
@@ -36,7 +36,7 @@ module.exports.registration = async (req, res) => {
         permission,
       };
   
-      res.json({result: true, data: responseData});
+      res.json({...responseData});
     }
     catch(err) {
       console.error(err);
@@ -55,23 +55,21 @@ module.exports.login = async (req, res, next) => {
         if(err){
           return next(err)
         }
-        if(!user){
-          return res.send("Wrong email or password")
-        }
         req.login(user, () => {
           const tokens = tokensGenerate(user);  
   
           responseData = {
             id: user.id,
+            image: user.image,
             userName: user.userName,
             surName: user.surName,
             firstName: user.firstName,
             middleName: user.middleName,
-            ...tokens,
             permission: user.permission,
+            ...tokens,
           };  
   
-          res.json({result: true, data: responseData});
+          res.json({...responseData});
         })
       })(req, res, next)
   

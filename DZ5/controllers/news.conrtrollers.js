@@ -58,12 +58,10 @@ module.exports.updateNews = async (req, res) => {
   }
 };
 
-
 module.exports.deleteNews = async (req, res) => {
     try {
       const {id} = req.params;
-  
-      const result = await Article.destroy({where: {id}});
+        const result = await Article.destroy({where: {id}});
       res.json({result: true, data: result});
     }
     catch(err) {

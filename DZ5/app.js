@@ -1,17 +1,19 @@
 const express = require('express');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
-
+const { socketServer } = require('./services/socket.service');
 const path = require('path');
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const session = require("express-session");
 const FileStore = require("session-file-store")(session);
 
-const User = require('./db').models.user;
-
 const app = express();
+const server = require('http').Server(app);
+const io = require('socket.io')(server).listen(8000);
+
 app.use(express.static(path.join(__dirname, 'build')));
+app.use('/', express.static(path.join(__dirname, 'build')));
 
 app.use(
 	session({
@@ -24,6 +26,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+const User = require('./db').models.user;
 
 const getUserbyName = async function (userName) {
     const user = await User.findOne({
@@ -78,5 +81,11 @@ const swaggerDocument = require('./swagger.json');
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api', require(path.join(__dirname, 'api')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
+});
+
+io.on('connection', socketServer);
 
 app.listen(3000, () => {});
