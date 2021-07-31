@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     surName: DataTypes.STRING,
     image: DataTypes.STRING,
     password: DataTypes.STRING,
-    permission: DataTypes.JSON,
+    permission: DataTypes.JSONB,
   }, {});
   user.associate = function(models) {
     // associations can be defined here

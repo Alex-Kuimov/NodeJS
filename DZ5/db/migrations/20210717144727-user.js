@@ -27,8 +27,29 @@ module.exports = {
         type: Sequelize.STRING
       },
       permission: {
-        type: Sequelize.STRING
-      },
+        type: Sequelize.JSONB,
+        allowNull: false,
+        value: {
+          chat: {
+            C: Sequelize.BOOLEAN,
+            R: Sequelize.BOOLEAN,
+            U: Sequelize.BOOLEAN,
+            D: Sequelize.BOOLEAN
+          },
+          news: {
+            C: Sequelize.BOOLEAN,
+            R: Sequelize.BOOLEAN,
+            U: Sequelize.BOOLEAN,
+            D: Sequelize.BOOLEAN
+          },
+          settings: {
+            C: Sequelize.BOOLEAN,
+            R: Sequelize.BOOLEAN,
+            U: Sequelize.BOOLEAN,
+            D: Sequelize.BOOLEAN
+          }
+        }
+      },  
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

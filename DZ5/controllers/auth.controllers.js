@@ -65,8 +65,8 @@ module.exports.login = async (req, res, next) => {
             surName: user.surName,
             firstName: user.firstName,
             middleName: user.middleName,
-            permission: user.permission,
             ...tokens,
+            permission: user.permission,
           };  
   
           res.json({...responseData});
