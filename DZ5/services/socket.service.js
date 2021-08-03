@@ -1,12 +1,10 @@
-const User = require('../db').models.chat;
+const Chat = require('../db').models.chat;
 const users = new Array();
 
 module.exports = {
   socketServer: function (socket) {
     socket
       .on('users:connect', ({ userId, username }) => {
-        console.log(`${username} connected`);
-
         const candidate = {
           username,
           socketId: socket.id,
@@ -21,8 +19,14 @@ module.exports = {
       .on('message:add', async (message) => {
         let dialog = new Object();
 
-        const newMessage = new Chat(message);
-        await newMessage.save();
+        const msg = {
+          senderId: message.senderId,
+          recipientId: message.recipientId,
+          roomId: message.roomId,
+          text: message.text
+        }
+
+        await Chat.create(message);
 
         users.forEach((user) => {
           if (user.userId === message.recipientId) dialog.to = user.socketId;
@@ -32,6 +36,7 @@ module.exports = {
         dialog.from === dialog.to
           ? socket.emit('message:add', message)
           : this.to(dialog.from).to(dialog.to).emit('message:add', message);
+
       })
       .on('message:history', async (dialog) => {
         const isMatchPersons = (dialog, msg) => {
@@ -43,7 +48,8 @@ module.exports = {
           }
           return false;
         };
-        const history = (await Chat.find()).filter((msg) =>
+
+        const history = (await Chat.findAll()).filter((msg) =>
           isMatchPersons(dialog, msg) ? true : false,
         );
 

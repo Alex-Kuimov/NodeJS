@@ -27,7 +27,6 @@ module.exports.permissionUser = async (req, res) => {
   }
 };
 
-
 module.exports.deleteUser = async (req, res) => {
     try {
       const {id} = req.params;

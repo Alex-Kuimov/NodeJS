@@ -3,7 +3,8 @@ const User = require('../db').models.user;
 module.exports.profile = async (req, res) => {
     try {
       const user = req.user;
-      const response = {
+      
+      const responseData = {
         id: user._id,
         username: user.username,
         surName: user.surName,
@@ -12,7 +13,7 @@ module.exports.profile = async (req, res) => {
         permission: user.permission,
         image: user.image,
       };
-      res.status(200).json(response);
+      res.json({...responseData});
     } 
     catch (err) {
       console.log(err);

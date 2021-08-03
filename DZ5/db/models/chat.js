@@ -3,7 +3,6 @@ module.exports = (sequelize, DataTypes) => {
   const chat = sequelize.define('chat', {
     senderId: DataTypes.STRING,
     recipientId: DataTypes.STRING,
-    middleName: DataTypes.STRING,
     roomId: DataTypes.STRING,
     text: DataTypes.STRING,
   }, {});
