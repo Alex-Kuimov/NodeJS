@@ -39,7 +39,8 @@
     "swagger-ui-express": "^4.1.6"
   },
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "build": "react-scripts build"
   },
   "eslintConfig": {
     "extends": "react-app"
