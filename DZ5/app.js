@@ -9,6 +9,8 @@ const FileStore = require("session-file-store")(session);
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 
+const PORT = process.env.PORT || 3000;
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -45,4 +47,6 @@ app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
 });
 
-server.listen(3000, () => {});
+server.listen(PORT, function () {
+	console.log(`App listening on port ${PORT}!`);
+});
