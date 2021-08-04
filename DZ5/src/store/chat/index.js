@@ -61,7 +61,7 @@ export default combineReducers({
 
 export const connectSocket = () => (dispatch, getState) => {
   const userProfile = userProfileSelector(getState());
-  socket = socketIO('https://loft-system-dz5.herokuapp.com');
+  socket = socketIO('https://loft-system-dz5.herokuapp.com/api');
 
   socket.emit('users:connect', { userId: userProfile.id, username: userProfile.username });
 
